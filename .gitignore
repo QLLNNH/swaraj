@@ -1,0 +1,11 @@
+# nodejs
+node_modules
+
+# webstorm
+.idea
+
+# mac
+.DS_Store
+
+# compress
+*.zip
