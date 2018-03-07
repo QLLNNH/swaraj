@@ -1,6 +1,6 @@
 {
   "name": "swaraj",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "micro service swaraj",
   "main": "index.js",
   "scripts": {
@@ -13,6 +13,6 @@
   "license": "ISC",
   "dependencies": {
     "jws": "3.1.4",
-    "mongoose": "5.0.7"
+    "mongoose": "5.0.9"
   }
 }

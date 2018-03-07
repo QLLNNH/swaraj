@@ -21,8 +21,8 @@ module.exports = class MS_Distributer {
         }
     }
 
-    is_valid_exp(payload) {
-        return Date.now() < payload.exp;
+    is_valid_exp(exp) {
+        return Date.now() < exp;
     }
 
     decode_token(token) {
