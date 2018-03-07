@@ -1,6 +1,6 @@
 {
   "name": "swaraj",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "micro service swaraj",
   "main": "index.js",
   "scripts": {
