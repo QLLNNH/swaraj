@@ -110,7 +110,7 @@ module.exports = class MS_Distributer {
             };
 
             if (bank.method !== 'GET' && bank.method !== 'DELETE') opt.headers['content-type'] = 'application/json';
-            else opt.path += `?data=${encodeURIComponent(JSON.stringify(bank.data))}&jws=${encodeURIComponent(JSON.stringify(bank.jws))}&geo=${encodeURIComponent(JSON.stringify(bank.geo))}&extra=${encodeURIComponent(JSON.stringify(bank.extra))}`;
+            else opt.path += `?data=${encodeURIComponent(JSON.stringify(bank.data || {}))}&jws=${encodeURIComponent(JSON.stringify(bank.jws || {}))}&geo=${encodeURIComponent(JSON.stringify(bank.geo || {}))}&extra=${encodeURIComponent(JSON.stringify(bank.extra))}`;
 
             const request = http.request(opt);
 
