@@ -6,8 +6,21 @@ const MS_Distributer = require('./ms_distributer');
 const ip_collector = require('./tools/ip_collector');
 
 class Swaraj {
+
     constructor() {
         this.is_init = false;
+    }
+
+    init() {
+        if (
+            true
+            && this.mongo instanceof MS_Mongo
+            && this.registry instanceof MS_Registry
+            && this.distributer instanceof MS_Distributer
+        ) this.is_init = true;
+        else {
+            throw new Error({ message: 'Swaraj not found config to init' });
+        }
     }
 
     init_mongo(config) {
@@ -27,17 +40,15 @@ class Swaraj {
         }
     }
 
-    init_registry(instance, watch_target) {
+    init_registry(instance, watched) {
         if (
             Object.prototype.toString.call(instance) !== '[object Object]'
             || Object.prototype.toString.call(instance.services) !== '[object Array]'
             || (instance.port >>> 0) === 0
+        ) throw new Error({ message: 'error config for init_registry' });
 
-        ) {
-            throw new Error({ message: 'error config for init_registry' });
-        }
-
-        if (typeof instance.host !== 'string') instance.host = ip_collector.get_inner_ip()[0];
+        if (typeof instance.host !== 'string' || instance.host.split('.').length !== 4)
+            instance.host = ip_collector.get_inner_ip()[0];
 
         if (instance.route_map) {
             if (Object.prototype.toString.call(instance.route_map) !== '[object Object]') {
@@ -75,7 +86,7 @@ class Swaraj {
         }
         else instance.route_map = null;
 
-        this.registry = new MS_Registry(this.mongo.model, instance, watch_target);
+        this.registry = new MS_Registry(this.mongo.model, instance, watched);
         this.registry.on('log', (msg) => console.log(msg));
     }
 
@@ -99,18 +110,6 @@ class Swaraj {
         else {
             this.distributer.check_tetrad(bank);
             return await this.distributer.rpc_on_http(bank);
-        }
-    }
-
-    init() {
-        if (
-            true
-            && this.mongo instanceof MS_Mongo
-            && this.registry instanceof MS_Registry
-            && this.distributer instanceof MS_Distributer
-        ) this.is_init = true;
-        else {
-            throw new Error({ message: 'Swaraj not found config for init' });
         }
     }
 }

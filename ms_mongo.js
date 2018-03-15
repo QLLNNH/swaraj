@@ -7,25 +7,24 @@ module.exports = class MS_Mongo extends Events {
 
     constructor(config) {
         super();
-        this.config = config;
-        this.init_connection();
-        this.config_schema();
+        this.init_connection(config);
+        this.config_schema(config);
         this.create_model();
     }
 
-    init_connection() {
-        this.connection = mongoose.createConnection(`${this.config.url}/${this.config.db_name}`, this.config.opt);
+    init_connection(config) {
+        this.connection = mongoose.createConnection(`${config.url}/${config.db_name}`, config.opt);
 
         this.connection.on('error', (err) => log.info({ ts: new Date().toISOString(), lv: 'SERIOUS', msg: err.message || err }));
 
-        this.connection.on('connected', () => log.info({ ts: new Date().toISOString(), lv: 'INFO', msg: `swaraj has already connected to mongodb.${this.config.db_name}` }));
+        this.connection.on('connected', () => log.info({ ts: new Date().toISOString(), lv: 'INFO', msg: `swaraj has already connected to mongodb.${config.db_name}` }));
 
-        this.connection.on('disconnected', () => log.info({ ts: new Date().toISOString(), lv: 'SERIOUS', msg: `swaraj has already disconnected from mongodb.${this.config.db_name}` }));
+        this.connection.on('disconnected', () => log.info({ ts: new Date().toISOString(), lv: 'SERIOUS', msg: `swaraj has already disconnected from mongodb.${config.db_name}` }));
     }
 
-    config_schema() {
+    config_schema(config) {
         this.schema = require('./schemas/ms.instance');
-        this.schema.set('autoIndex', this.config.auto_index || false);
+        this.schema.set('autoIndex', config.auto_index || false);
     }
 
     create_model() {
@@ -33,3 +32,5 @@ module.exports = class MS_Mongo extends Events {
     }
 }
 
+// TODO
+// 数据库断开后的处理

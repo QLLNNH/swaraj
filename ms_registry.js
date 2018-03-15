@@ -1,4 +1,5 @@
 'use strict';
+const log = require('./tools/log');
 const Events = require('events');
 const mongoose = require('mongoose');
 const detector = require('./tools/detector');
@@ -6,34 +7,35 @@ const MS_Watcher = require('./ms_watcher');
 
 module.exports = class MS_Registry extends Events {
 
-    constructor(model, instance, watch_target) {
+    constructor(model, instance, watched) {
         super();
 
         this.model = model;
+        this.watched = watched;
         this.instance = instance;
-        this.watch_target = watch_target;
 
         this.route_map = new Map();
         this.service_map = new Map();
         this.instance_map = new Map();
 
         this.init_update_instance_timer();
-        if (Array.isArray(this.watch_target)) this.init_watcher();
+        if (Array.isArray(this.watched)) this.init_watcher();
         this.init_task();
     }
 
     async init_task() {
-        if (Array.isArray(this.watch_target)) await this.load_instances();
+        if (Array.isArray(this.watched)) await this.load_instances();
         await this.register_instance();
     }
 
-    init_watcher(expresion) {
+    init_watcher() {
         this.watcher = new MS_Watcher(this.model);
+
         this.watcher.on('change', (change) => {
             if (change.opt === 'insert') {
                 if (! this.instance.services.includes(change.doc.service)) {
-                    if (this.watch_target.length === 0) this.insert(change.doc);
-                    else if (this.watch_target.includes(change.doc.service)) this.insert(change.doc);
+                    if (this.watched.length === 0) this.insert(change.doc);
+                    else if (this.watched.includes(change.doc.service)) this.insert(change.doc);
                 }
             }
             else if (change.opt === 'delete') this.delete(change.id);
@@ -59,8 +61,8 @@ module.exports = class MS_Registry extends Events {
             const instances = await this.model.find({}, { u_ts: 0 }, { lean: true });
             for (let instance of instances) {
                 if (! this.instance.services.includes(instance.service)) {
-                    if (this.watch_target.length === 0) this.insert(instance);
-                    else if (this.watch_target.includes(instance.service)) this.insert(instance);
+                    if (this.watched.length === 0) this.insert(instance);
+                    else if (this.watched.includes(instance.service)) this.insert(instance);
                 }
             }
         }
@@ -87,11 +89,12 @@ module.exports = class MS_Registry extends Events {
         }
     }
 
-    async insert(instance) {
-        try {
-            await detector.connect({ host: instance.host, port: instance.port });
+    insert(instance) {
+        const socket = detector.create_connection(instance);
 
+        socket.on('connect', () => {
             instance._id = instance._id.toString();
+
             this.instance_map.set(instance._id, { _id: instance._id, service: instance.service, host: instance.host, port: instance.port });
 
             this.route_map.set(instance.service, instance.route_map);
@@ -100,10 +103,13 @@ module.exports = class MS_Registry extends Events {
             const v = { host: instance.host, port: instance.port };
             if (this.service_map.has(instance.service)) this.service_map.get(instance.service).set(k, v);
             else this.service_map.set(instance.service, new Map([[k, v]]));
-        }
-        catch (err) {
-            this.emit('log', { lv: 'INFO', message: err.message || err });
-        }
+
+            log.info({ ts: new Date().toISOString(), lv: 'INFO', msg: `insert ${instance.service}:${instance.host}:${instance.port}` });
+        });
+
+        socket.on('error', (err) => this.emit('log', { lv: 'INFO', message: err.message || err }));
+
+        socket.on('close', (err) => this.delete(instance._id));
     }
 
     delete(id) {
@@ -119,6 +125,7 @@ module.exports = class MS_Registry extends Events {
                 }
             }
             this.instance_map.delete(id);
+            log.info({ ts: new Date().toISOString(), lv: 'INFO', msg: `delete ${instance.service}:${instance.host}:${instance.port}` });
         }
     }
 }
