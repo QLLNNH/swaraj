@@ -2,8 +2,8 @@
 const log = require('./tools/log');
 const Events = require('events');
 const mongoose = require('mongoose');
-const detector = require('./tools/detector');
 const MS_Watcher = require('./ms_watcher');
+const MS_Detector = require('./ms_detector');
 
 module.exports = class MS_Registry extends Events {
 
@@ -90,7 +90,7 @@ module.exports = class MS_Registry extends Events {
     }
 
     insert(instance) {
-        const socket = detector.create_connection(instance);
+        const socket = new MS_Detector(instance);
 
         socket.on('connect', () => {
             instance._id = instance._id.toString();
@@ -106,8 +106,6 @@ module.exports = class MS_Registry extends Events {
 
             log.info({ ts: new Date().toISOString(), lv: 'INFO', msg: `insert ${instance.service}:${instance.host}:${instance.port}` });
         });
-
-        socket.on('error', (err) => this.emit('log', { lv: 'INFO', message: err.message || err }));
 
         socket.on('close', (err) => this.delete(instance._id));
     }

@@ -1,5 +1,6 @@
 'use strict';
 let single_swaraj;
+const log = require('./tools/log');
 const MS_Mongo = require('./ms_mongo');
 const MS_Registry = require('./ms_registry');
 const MS_Distributer = require('./ms_distributer');
@@ -87,7 +88,7 @@ class Swaraj {
         else instance.route_map = null;
 
         this.registry = new MS_Registry(this.mongo.model, instance, watched);
-        this.registry.on('log', (msg) => console.log(msg));
+        this.registry.on('log', (msg) => log.info(msg));
     }
 
     init_distributer(jws_config, algorithm) {
