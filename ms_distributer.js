@@ -62,8 +62,8 @@ module.exports = class MS_Distributer {
         if (route.is_verify) {
             if (! this.jws_config) throw({
                 lv: 'ERROR'
-                , message: 'need check config'
-                , result: { status: 204, description: 'need check config', data: null }
+                , message: 'need crypto config'
+                , result: { status: 204, description: 'need crypto config', data: null }
             });
 
             if (! bank.token) throw({
