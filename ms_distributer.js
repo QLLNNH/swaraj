@@ -106,7 +106,7 @@ module.exports = class MS_Distributer {
                 , port: target_service.port
                 , path: bank.path
                 , method: bank.method
-                , headers: {}
+                , headers: { 'x-auth-token': bank.token }
             };
 
             if (bank.method !== 'GET' && bank.method !== 'DELETE') opt.headers['content-type'] = 'application/json';
