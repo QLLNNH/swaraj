@@ -23,9 +23,18 @@ module.exports = class MS_Registry extends Events {
         this.init_task();
     }
 
-    async init_task() {
-        if (Array.isArray(this.watched)) await this.load_instances();
-        await this.register_instance();
+    init_update_instance_timer() {
+        this.timer = setInterval(async () => {
+            try {
+                for (let service of this.instance.services) {
+                    const raw = await this.model.update({ service: service, host: this.instance.host, port: this.instance.port }, { $set: { u_ts: new Date() } });
+                    if (raw.n !== 1) await this.register_instance([service]);
+                }
+            }
+            catch (err) {
+                this.emit('log', { lv: 'SERIOUS', message: err.message || err });
+            }
+        }, 30000);
     }
 
     init_watcher() {
@@ -42,18 +51,9 @@ module.exports = class MS_Registry extends Events {
         });
     }
 
-    init_update_instance_timer() {
-        this.timer = setInterval(async () => {
-            try {
-                for (let service of this.instance.services) {
-                    const raw = await this.model.update({ service: service, host: this.instance.host, port: this.instance.port }, { $set: { u_ts: new Date() } });
-                    if (raw.n !== 1) await this.register_instance([service]);
-                }
-            }
-            catch (err) {
-                this.emit('log', { lv: 'SERIOUS', message: err.message || err });
-            }
-        }, 30000);
+    async init_task() {
+        if (Array.isArray(this.watched)) await this.load_instances();
+        await this.register_instance();
     }
 
     async load_instances() {

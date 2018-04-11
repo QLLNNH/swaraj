@@ -18,7 +18,9 @@ class Swaraj {
             && this.mongo instanceof MS_Mongo
             && this.registry instanceof MS_Registry
             && this.distributer instanceof MS_Distributer
-        ) this.is_init = true;
+        ) {
+            this.is_init = true;
+        }
         else {
             throw new Error({ message: 'Swaraj not found config to init' });
         }
@@ -35,7 +37,9 @@ class Swaraj {
             && typeof config.opt.pass === 'string'
             && typeof config.opt.replicaSet === 'string'
             && typeof config.opt.authSource === 'string'
-        ) this.mongo = new MS_Mongo(config);
+        ) {
+            this.mongo = new MS_Mongo(config);
+        }
         else {
             throw new Error({ message: 'error config for init_mongo' });
         }
@@ -46,10 +50,13 @@ class Swaraj {
             Object.prototype.toString.call(instance) !== '[object Object]'
             || Object.prototype.toString.call(instance.services) !== '[object Array]'
             || (instance.port >>> 0) === 0
-        ) throw new Error({ message: 'error config for init_registry' });
+        ) {
+            throw new Error({ message: 'error config for init_registry' });
+        }
 
-        if (typeof instance.host !== 'string' || instance.host.split('.').length !== 4)
+        if (typeof instance.host !== 'string' || instance.host.split('.').length !== 4) {
             instance.host = ip_collector.get_inner_ip()[0];
+        }
 
         if (instance.route_map) {
             if (Object.prototype.toString.call(instance.route_map) !== '[object Object]') {
@@ -107,10 +114,12 @@ class Swaraj {
     }
 
     async rpc(bank) {
-        if (! this.is_init) return Promise.reject({ message: 'Swaraj need init' });
-        else {
+        if (this.is_init) {
             this.distributer.check_tetrad(bank);
             return await this.distributer.rpc_on_http(bank);
+        }
+        else {
+            return Promise.reject({ message: 'Swaraj need init' });
         }
     }
 }
