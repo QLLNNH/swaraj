@@ -160,4 +160,60 @@ module.exports = class MS_Distributer {
             else request.end(JSON.stringify({ data: bank.data, jws: bank.jws, geo: bank.jws, extra: bank.extra }));
         });
     }
+
+    rpc_on_http_with_xml = (bank) => {
+        return new Promise((resolve, reject) => {
+            const instance_map = this.registry.service_map.get(bank.service);
+
+            if (! instance_map) throw({
+                lv: 'ERROR'
+                , message: 'unknow service'
+                , result: { status: 221, description: 'unknow service', data: null }
+            });
+
+            const target_service = instance_map.get([...instance_map.keys()][Math.floor(Math.random() * instance_map.size)]);
+
+            const request = http.request({
+                agent: agent
+                , host: target_service.host
+                , port: target_service.port
+                , path: bank.path
+                , method: bank.method
+                , headers: { 'content-type': 'application/xml' }
+            });
+
+            request.setTimeout(rpc_timeout, () => {
+                request.abort();
+                return reject({
+                    lv: 'ERROR'
+                    , message: 'downstream timeout'
+                    , result: { status: 801, description: 'downstream timeout', data: null }
+                });
+            });
+
+            request.on('error', (err) => reject({
+                lv: 'ERROR'
+                , message: err.message || err
+                , result: { status: 802, description: 'http emit error', data: null }
+            }));
+
+            request.on('response', (res) => {
+                if (res.statusCode !== 200) return reject({
+                    lv: 'ERROR'
+                    , message: `rpc response unlawful ${res.statusCode}`
+                    , result: { status: 803, description: `rpc response unlawful ${res.statusCode}`, data: null }
+                });
+
+                let count = 0, chunks = [];
+                res.on('data', (chunk) => {
+                    chunks.push(chunk);
+                    count += chunk.length;
+                });
+
+                res.on('end', () => resolve(Buffer.concat(chunks, count)));
+            });
+
+            request.end(bank.xml);
+        });
+    }
 }

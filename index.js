@@ -122,6 +122,16 @@ class Swaraj {
             return Promise.reject({ message: 'Swaraj need init' });
         }
     }
+
+    async rpc_with_xml(bank) {
+        if (this.is_init) {
+            this.distributer.check_tetrad(bank);
+            return await this.distributer.rpc_on_http_with_xml(bank);
+        }
+        else {
+            return Promise.reject({ message: 'Swaraj need init' });
+        }
+    }
 }
 
 module.exports = () => {
