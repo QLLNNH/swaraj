@@ -161,7 +161,7 @@ module.exports = class MS_Distributer {
         });
     }
 
-    rpc_on_http_with_xml = (bank) => {
+    rpc_on_http_with_xml(bank) {
         return new Promise((resolve, reject) => {
             const instance_map = this.registry.service_map.get(bank.service);
 
