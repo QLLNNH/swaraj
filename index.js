@@ -4,6 +4,7 @@ const log = require('./tools/log');
 const MS_Mongo = require('./ms_mongo');
 const MS_Registry = require('./ms_registry');
 const MS_Distributer = require('./ms_distributer');
+const validator = require('./tools/validator');
 const ip_collector = require('./tools/ip_collector');
 
 class Swaraj {
@@ -115,7 +116,16 @@ class Swaraj {
 
     async rpc(bank) {
         if (this.is_init) {
-            this.distributer.check_tetrad(bank);
+            const route = this.distributer.check_tetrad(bank);
+
+            if (route.is_restrict) {
+                const permission_bank = { service: 'org', method: 'GET', path: '/permission', jws: bank.jws };
+                const permission_ret = await this.distributer.rpc_on_http(permission_bank);
+
+                if (permission_ret.status !== 100) return permission_ret;
+                else validator.check(bank.method, bank.path, route.pattern, ret.data);
+            }
+
             return await this.distributer.rpc_on_http(bank);
         }
         else {
