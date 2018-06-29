@@ -123,7 +123,7 @@ class Swaraj {
                 const permission_ret = await this.distributer.rpc_on_http(permission_bank);
 
                 if (permission_ret.status !== 100) return permission_ret;
-                else validator.check(bank.method, bank.path, route.pattern, ret.data);
+                else validator.check(bank.method, bank.path, route.pattern, permission_ret.data);
             }
 
             return await this.distributer.rpc_on_http(bank);
