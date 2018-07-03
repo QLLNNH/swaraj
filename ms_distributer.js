@@ -159,7 +159,7 @@ module.exports = class MS_Distributer {
             });
 
             if (bank.method === 'GET' || bank.method === 'DELETE') request.end();
-            else request.end(JSON.stringify({ data: bank.data, jws: bank.jws, geo: bank.jws, extra: bank.extra }));
+            else request.end(JSON.stringify({ data: bank.data, jws: bank.jws, geo: bank.geo, extra: bank.extra }));
         });
     }
 
