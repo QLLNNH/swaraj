@@ -49,7 +49,7 @@ module.exports = class MS_Distributer {
             , result: { status: 222, description: 'unknow method', data: null }
         });
 
-        const route = route_map[bank.method].find((item) => item.path.test(bank.path.search));
+        const route = route_map[bank.method].find((item) => item.path.test(bank.path));
         if (! route) throw({
             lv: 'ERROR'
             , message: 'unknow path'
@@ -102,7 +102,7 @@ module.exports = class MS_Distributer {
             , result: { status: 222, description: 'unknow method', data: null }
         });
 
-        const route = route_map[bank.method].find((item) => item.path.test(bank.path.search));
+        const route = route_map[bank.method].find((item) => item.path.test(bank.path));
         if (! route) throw({
             lv: 'ERROR'
             , message: 'unknow path'
