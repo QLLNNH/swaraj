@@ -27,7 +27,7 @@ module.exports = class MS_Registry extends Events {
         this.timer = setInterval(async () => {
             try {
                 for (let service of this.instance.services) {
-                    const raw = await this.model.update({ service: service, host: this.instance.host, port: this.instance.port }, { $set: { u_ts: new Date() } });
+                    const raw = await this.model.updateOne({ service: service, host: this.instance.host, port: this.instance.port }, { $set: { u_ts: new Date() } });
                     if (raw.n !== 1) await this.register_instance([service]);
                 }
             }
@@ -74,7 +74,7 @@ module.exports = class MS_Registry extends Events {
     async register_instance(services = this.instance.services) {
         try {
             for (let service of services) {
-                await this.model.update(
+                await this.model.updateOne(
                     { service: service, host: this.instance.host, port: this.instance.port }
                     , {
                         $set: { route_map: this.instance.route_map ? this.instance.route_map[service] : null, u_ts: new Date() }

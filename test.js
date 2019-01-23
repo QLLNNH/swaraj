@@ -6,10 +6,12 @@ const mongodb_config = {
     , db_name: 'dqy'
     , opt: {
         user: 'nodejs'
-        , pass: 'KjoQrnGepdvox7ziw1O6DY3DpdT'
+        , pass: 'pwd'
         , replicaSet: 'iot-rs-1'
         , authSource: 'admin'
+        , useCreateIndex: true
         , useNewUrlParser: true
+        , useFindAndModify: false
     }
     , auto_index: true
 };
