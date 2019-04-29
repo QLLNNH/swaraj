@@ -3,7 +3,11 @@ const Koa = require('koa');
 const swaraj = require('../index')();
 const app = new Koa();
 const routes = {
-    app1: null
+    app1: {
+        GET: [
+            { path: new RegExp('^/gym$'), is_verify: false, check_exp: false }
+        ]
+    }
 };
 
 const server = require('http').createServer(app.callback()).listen(0, '0.0.0.0', () => {

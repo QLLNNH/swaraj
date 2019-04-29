@@ -20,3 +20,13 @@ swaraj.init_mongo({
 swaraj.init_registry({ port: 3000, routes: routes, watched: [] });
 swaraj.init_distributer();
 swaraj.init();
+
+setTimeout(async () => {
+    try {
+        const route = swaraj.get_route({ service: 'app1', method: 'GET', path: '/gym' });
+        await swaraj.rpc({ service: 'app1', method: 'GET', path: '/gym' });
+    }
+    catch (err) {
+        console.error(err);
+    }
+}, 1000);
