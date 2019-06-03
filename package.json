@@ -12,7 +12,6 @@
   "author": "chaconne",
   "license": "ISC",
   "dependencies": {
-    "koa": "2.7.0",
-    "mongoose": "5.5.4"
+    "mongoose": "5.5.12"
   }
 }
