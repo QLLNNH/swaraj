@@ -12,6 +12,6 @@
   "author": "chaconne",
   "license": "ISC",
   "dependencies": {
-    "mongoose": "5.10.9"
+    "mongoose": "5.11.10"
   }
 }
