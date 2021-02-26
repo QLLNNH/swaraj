@@ -12,6 +12,7 @@
   "author": "chaconne",
   "license": "ISC",
   "dependencies": {
-    "mongoose": "5.11.10"
+    "dqy-result": "0.0.2",
+    "mongoose": "5.11.18"
   }
 }
